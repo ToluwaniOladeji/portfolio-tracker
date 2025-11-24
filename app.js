@@ -225,3 +225,118 @@ function renderPortfolio() {
     container.innerHTML = html;
     updateSummary();
 }
+
+// Update summary cards
+function updateSummary() {
+    const totalValue = portfolio.reduce((sum, asset) => sum + asset.currentValue, 0);
+    const totalPurchaseValue = portfolio.reduce((sum, asset) => sum + (asset.purchasePrice * asset.quantity), 0);
+    const totalPL = totalValue - totalPurchaseValue;
+
+    document.getElementById('total-value').textContent = `$${totalValue.toFixed(2)}`;
+    document.getElementById('total-pl').textContent = `${totalPL >= 0 ? '+' : ''}$${totalPL.toFixed(2)}`;
+    document.getElementById('total-pl').className = `value ${totalPL >= 0 ? 'positive' : 'negative'}`;
+    document.getElementById('total-assets').textContent = portfolio.length;
+}
+
+// Filter and sort portfolio
+function filterAndSort() {
+    const searchTerm = document.getElementById('search-portfolio').value.toLowerCase();
+    const filterType = document.getElementById('filter-type').value;
+    const sortBy = document.getElementById('sort-by').value;
+
+    let filtered = portfolio.filter(asset => {
+        const matchesSearch = asset.symbol.toLowerCase().includes(searchTerm) || 
+                            asset.name.toLowerCase().includes(searchTerm);
+        const matchesFilter = filterType === 'all' || asset.type === filterType;
+        return matchesSearch && matchesFilter;
+    });
+
+    filtered.sort((a, b) => {
+        if (sortBy === 'symbol') return a.symbol.localeCompare(b.symbol);
+        if (sortBy === 'value') return b.currentValue - a.currentValue;
+        if (sortBy === 'gain') {
+            const gainA = (a.currentPrice - a.purchasePrice) * a.quantity;
+            const gainB = (b.currentPrice - b.purchasePrice) * b.quantity;
+            return gainB - gainA;
+        }
+        return 0;
+    });
+
+    const temp = portfolio;
+    portfolio = filtered;
+    renderPortfolio();
+    portfolio = temp;
+}
+
+// Load news from API
+async function loadNews() {
+    try {
+        console.log('Loading news from:', `${API_BASE}/api/news`);
+        const data = await apiCall('/api/news');
+        console.log('News data received:', data);
+        
+        if (data.error) {
+            console.error('News API error:', data.error);
+            document.getElementById('news-container').innerHTML = '<p class="error-message">Failed to load news: ' + data.error + '</p>';
+            return;
+        }
+        
+        allNews = data.articles || [];
+        console.log('Total articles:', allNews.length);
+        renderNews();
+    } catch (error) {
+        console.error('Error loading news:', error);
+        document.getElementById('news-container').innerHTML = '<p class="loading">Failed to load news. Please check your API key.</p>';
+    }
+}
+
+// Render news cards
+function renderNews() {
+    const container = document.getElementById('news-container');
+    
+    if (allNews.length === 0) {
+        container.innerHTML = '<p class="loading">No news available</p>';
+        return;
+    }
+
+    container.innerHTML = allNews.slice(0, 6).map(article => `
+        <div class="news-card">
+            <img src="${article.urlToImage || 'https://via.placeholder.com/400x200/6366f1/ffffff?text=Financial+News'}" 
+                 alt="${article.title}" 
+                 onerror="this.src='https://via.placeholder.com/400x200/6366f1/ffffff?text=Financial+News'">
+            <div class="content">
+                <div class="source">${article.source.name} • ${new Date(article.publishedAt).toLocaleDateString()}</div>
+                <h3>${article.title}</h3>
+                <p>${article.description || 'No description available'}</p>
+                <a href="${article.url}" target="_blank">Read more →</a>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Save portfolio to localStorage
+function savePortfolio() {
+    localStorage.setItem('portfolio', JSON.stringify(portfolio));
+}
+
+// Load portfolio from localStorage
+function loadPortfolio() {
+    const saved = localStorage.getItem('portfolio');
+    if (saved) {
+        portfolio = JSON.parse(saved);
+        renderPortfolio();
+    }
+}
+
+// Event listeners
+document.getElementById('add-asset-form').addEventListener('submit', addAsset);
+document.getElementById('asset-type').addEventListener('change', (e) => {
+    populateSymbolDropdown(e.target.value);
+});
+document.getElementById('search-portfolio').addEventListener('input', filterAndSort);
+document.getElementById('filter-type').addEventListener('change', filterAndSort);
+document.getElementById('sort-by').addEventListener('change', filterAndSort);
+
+// Initialize
+loadPortfolio();
+loadNews();
