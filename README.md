@@ -433,7 +433,7 @@ sudo apt install python3
 
 ## 🎬 Demo Video
 
-**Hosted**: [YouTube/Vimeo/Google Drive Link]
+https://www.loom.com/share/1bfbdf5523ba4cc6bb5d101e5d4898c6
 
 
 ## 🙏 Acknowledgments
