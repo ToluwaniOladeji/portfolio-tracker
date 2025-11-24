@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Portfolio Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>Portfolio Tracker</h1>
+                <p class="tagline">Smart Investment Monitoring</p>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div id="message-container"></div>
+
+            <div class="search-section">
+                <h2>Add New Asset</h2>
+                <form class="search-form" id="add-asset-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="asset-type">Asset Type</label>
+                            <select id="asset-type" required>
+                                <option value="">Select Type</option>
+                                <option value="stock">Stock</option>
+                                <option value="crypto">Cryptocurrency</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symbol">Asset Symbol</label>
+                            <select id="symbol" required disabled>
+                                <option value="">Select asset type first</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" id="quantity" placeholder="e.g., 10" step="0.00001" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="purchase-price">Purchase Price (Optional)</label>
+                            <input type="number" id="purchase-price" placeholder="Leave empty for current price" step="0.01">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <span>+</span> Add to Portfolio
+                    </button>
+                </form>
+            </div>
+
+            <div class="portfolio-summary" id="portfolio-summary">
+                <div class="summary-card card-1">
+                    <div class="card-icon">💵</div>
+                    <h3>Total Value</h3>
+                    <div class="value" id="total-value">$0.00</div>
+                </div>
+                <div class="summary-card card-2">
+                    <div class="card-icon">📈</div>
+                    <h3>Profit/Loss</h3>
+                    <div class="value" id="total-pl">$0.00</div>
+                </div>
+                <div class="summary-card card-3">
+                    <div class="card-icon">🎯</div>
+                    <h3>Total Assets</h3>
+                    <div class="value" id="total-assets">0</div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <div class="controls">
+                    <input type="text" id="search-portfolio" placeholder="🔍 Search your portfolio...">
+                    <select id="filter-type">
+                        <option value="all">All Assets</option>
+                        <option value="stock">📊 Stocks Only</option>
+                        <option value="crypto">₿ Crypto Only</option>
+                    </select>
+                    <select id="sort-by">
+                        <option value="symbol">Sort by Symbol</option>
+                        <option value="value">Sort by Value</option>
+                        <option value="gain">Sort by Gain/Loss</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="portfolio-container">
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <h3>Your Portfolio is Empty</h3>
+                    <p>Start building your investment portfolio by adding your first asset above!</p>
+                </div>
+            </div>
+
+            <div class="news-section">
+                <h2>Financial News Feed</h2>
+                <div class="news-grid" id="news-container">
+                    <div class="loading">Loading latest news...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
